@@ -1,0 +1,31 @@
+
+.text {
+    max-width: 800px; 
+    margin: 40px auto; 
+    padding: 20px;
+    background-color: #fff; 
+    border-radius: 10px; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+    color: #333; 
+  }
+  
+  .text h1 {
+    color: #6c63ff; 
+    margin-bottom: 20px; 
+  
+  .text p {
+    text-align: justify; 
+    margin-bottom: 15px; 
+  }
+  
+
+  @media (max-width: 600px) {
+    .text {
+      margin: 20px;
+      padding: 15px;
+    }
+  
+    .text h1 {
+      font-size: 2.5em;}
+  }
+}
