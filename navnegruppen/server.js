@@ -6,13 +6,11 @@ const bcrypt = require('bcrypt');
 const app = express();
 const port = 5173;
 
-// Connect to MongoDB (Make sure your MongoDB server is running)
-mongoose.connect('mongodb://localhost:27017/NewbornNamesDB', {
+mongoose.connect('mongodb://mongodb:27017/NewbornNamesDB', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-// Create a User schema
 const userSchema = new mongoose.Schema({
   username: String,
   password: String,
@@ -23,25 +21,20 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
-// Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// Registration route
 app.post('/api/register', async (req, res) => {
   const { username, password, firstName, lastName, email } = req.body;
 
   try {
-    // Check if the user already exists
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Hash the password before saving it
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new user
     const newUser = new User({
       username,
       password: hashedPassword,
@@ -58,26 +51,21 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// Login route
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    // Check if the user exists
     const user = await User.findOne({ username });
 
     if (!user) {
       return res.status(401).json({ message: 'User not found' });
     }
 
-    // Check if the provided password matches the hashed password in the database
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (passwordMatch) {
-      // Passwords match, user is authenticated
       return res.status(200).json({ message: 'Login successful' });
     } else {
-      // Passwords don't match
       return res.status(401).json({ message: 'Invalid password' });
     }
   } catch (error) {
@@ -86,7 +74,6 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

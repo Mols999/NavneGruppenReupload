@@ -1,0 +1,16 @@
+FROM node:14
+
+WORKDIR /usr/src/app
+
+# Kopier package.json og package-lock.json separat for at undgå at installere afhængigheder ved mindste ændringer i projektet
+COPY package.json .
+COPY package-lock.json .
+
+# Installer Node.js-afhængigheder
+RUN npm install
+
+# Kopier resten af koden
+COPY . .
+
+# Kør serveren
+CMD ["npm", "start"]
