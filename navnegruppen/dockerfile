@@ -1,20 +1,13 @@
-# Brug den officielle Node.js 16.x-billedbase
 FROM node:16
 
-# Opret arbejdsbiblioteket
 WORKDIR /usr/src/app
 
-# Kopier pakkefilerne til arbejdsbiblioteket
 COPY package*.json ./
 
-# Installer afhængigheder
 RUN npm install
 
-# Kopier resten af ​​applikationskoden
 COPY . .
 
-# Udsæt porten, som din app kører på
 EXPOSE 3000
 
-# Kommando til at køre din app
 CMD ["npm", "start"]
