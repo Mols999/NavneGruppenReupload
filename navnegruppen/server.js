@@ -6,10 +6,13 @@ const bcrypt = require('bcrypt');
 const app = express();
 const port = 5173;
 
-mongoose.connect('mongodb://mongodb:27017/NewbornNamesDB', {
+// Ændret forbindelsesstrengen til MongoDB Atlas
+mongoose.connect('mongodb+srv://Mols:ID4EY0Cqr80zSnH2@cluster0.euyeftl.mongodb.net/NewbornNamesCloudDB?retryWrites=true&w=majority', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-});
+})
+  .then(() => console.log('MongoDB Connected'))
+  .catch(err => console.log(err));
 
 const userSchema = new mongoose.Schema({
   username: String,
