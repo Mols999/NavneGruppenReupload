@@ -1,51 +1,79 @@
+/* Login.css */
+
+/* Container styles */
 .login-container {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    background-color: #fff;
-  }
-  
-  .login-container h2 {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  
-  .form-group {
-    margin-bottom: 15px;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-  }
-  
-  .form-group input[type="email"],
-  .form-group input[type="password"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  button[type="submit"] {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
-  }
-  
-  button[type="submit"]:hover {
-    background-color: #0056b3;
-  }
-  
+  display: flex;
+  flex-direction: column; /* Change to column */
+  justify-content: flex-start; /* Align content at the top */
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f2f5; /* Facebook background color */
+}
+
+/* Form styles */
+.login-form {
+  background-color: #ffffff;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center;
+  width: 300px; /* Adjust the width as needed */
+  margin-top: 20px; /* Add margin to push it down */
+}
+
+/* Heading styles */
+h2 {
+  color: #000000; /* Facebook blue color */
+}
+
+/* Input styles */
+.form-group {
+  margin: 15px 0;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.form-group input[type="email"],
+.form-group input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button[type="submit"] {
+  background-color: #1877f2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 10px 15px;
+  width: 100%;
+}
+
+button[type="submit"]:hover {
+  background-color: #145da0;
+}
+
+/* Link styles */
+.link-to-register {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.link-to-register a {
+  text-decoration: none;
+  color: #1877f2; /* Facebook blue color */
+  font-weight: bold;
+}
+
+.link-to-register a:hover {
+  text-decoration: underline;
+}

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import './Register.css'; // You can create a CSS file for styling
+import React, { useState, useEffect } from 'react';
+import './Register.css';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function Register() {
   const [username, setUsername] = useState('');
@@ -9,90 +10,107 @@ function Register() {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [registrationMessage, setRegistrationMessage] = useState('');
+  const [sessionLoaded, setSessionLoaded] = useState(false); // Define sessionLoaded state
 
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/session', {
+          credentials: 'include',
+        });
+        const data = await response.json();
+        console.log('User data from session:', data);
+  
+        if (data.loggedIn) {
+          // Optionally, you can set state here if needed
+        }
+      } finally {
+        // Mark session data as loaded regardless of success or failure
+        setSessionLoaded(true);
+      }
+    };
+  
+    checkSession();
+  }, []);
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
-      const response = await axios.post('/api/register', {
+      const response = await axios.post('http://localhost:5000/register', {
         username,
         password,
         firstName,
         lastName,
         email,
       });
-  
+
       if (response.status === 201) {
-        // Registration successful
-        setRegistrationMessage('Registrering vellykket');
-        // You can redirect or update application state here
+        navigate('/listofnames');
+      } else {
+        setRegistrationMessage('Registration failed');
       }
     } catch (error) {
-      console.error('Registration error:', error.response?.data?.message || 'Internal server error');
-      setRegistrationMessage(error.response?.data?.message || 'Internal server error');
+      setRegistrationMessage(error.response.data.message || 'Registration failed');
     }
-  
-    // Clear form fields if needed
-    setUsername('');
-    setPassword('');
-    setFirstName('');
-    setLastName('');
-    setEmail('');
   };
-  
 
   return (
-    <div className="register-container">
-      <h2>Opret konto</h2>
-      {registrationMessage && <p>{registrationMessage}</p>}
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Brugernavn:</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Adgangskode:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Fornavn:</label>
-          <input
-            type="text"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Efternavn:</label>
-          <input
-            type="text"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Opret konto</button>
-      </form>
+    <div className="register-box"> {/* Add a new class for the box */}
+      <div className="register-container">
+        <h2>Opret konto</h2>
+        {registrationMessage && <p>{registrationMessage}</p>}
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Brugernavn:</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Adgangskode:</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Fornavn:</label>
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Efternavn:</label>
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Email:</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit">Opret konto</button>
+        </form>
+      </div>
     </div>
   );
 }

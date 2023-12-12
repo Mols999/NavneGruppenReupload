@@ -4,7 +4,7 @@ function LikedNames() {
   return (
     <div>
       <h2>Liked Names</h2>
-      {/* Add your content here */}
+      {/*  */}
     </div>
   );
 }
