@@ -1,32 +1,31 @@
-/* Support.css */
 
-/* Container styles */
+
+
 .support-container {
     display: flex;
-    flex-direction: column; /* Change to column */
-    justify-content: flex-start; /* Align content at the top */
+    flex-direction: column; 
+    justify-content: flex-start; 
     align-items: center;
     height: 100vh;
-    background-color: #f0f2f5; /* Facebook background color */
+    background-color: #f0f2f5; 
   }
   
-  /* Form styles */
+
   .support-form {
     background-color: #ffffff;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     padding: 20px;
     text-align: center;
-    width: 300px; /* Adjust the width as needed */
-    margin-top: 20px; /* Add margin to push it down */
+    width: 300px; 
+    margin-top: 20px; 
   }
   
-  /* Heading styles */
+
   h2 {
-    color: #000000; /* Facebook blue color */
+    color: #000000; 
   }
-  
-  /* Input styles */
+
   .form-group {
     margin: 15px 0;
     text-align: left;
@@ -63,7 +62,7 @@
     background-color: #145da0;
   }
   
-  /* Link styles */
+ 
   .link-to-register {
     text-align: center;
     margin-top: 10px;
@@ -71,7 +70,7 @@
   
   .link-to-register a {
     text-decoration: none;
-    color: #1877f2; /* Facebook blue color */
+    color: #1877f2; 
     font-weight: bold;
   }
   

@@ -10,8 +10,7 @@ function Register() {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [registrationMessage, setRegistrationMessage] = useState('');
-  const [sessionLoaded, setSessionLoaded] = useState(false); // Define sessionLoaded state
-
+  const [sessionLoaded, setSessionLoaded] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,10 +23,10 @@ function Register() {
         console.log('User data from session:', data);
   
         if (data.loggedIn) {
-          // Optionally, you can set state here if needed
+          
         }
       } finally {
-        // Mark session data as loaded regardless of success or failure
+    
         setSessionLoaded(true);
       }
     };
@@ -58,7 +57,7 @@ function Register() {
   };
 
   return (
-    <div className="register-box"> {/* Add a new class for the box */}
+    <div className="register-box"> 
       <div className="register-container">
         <h2>Opret konto</h2>
         {registrationMessage && <p>{registrationMessage}</p>}

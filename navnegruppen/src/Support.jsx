@@ -13,9 +13,8 @@ function Support() {
   });
 
   const [ticketCreated, setTicketCreated] = useState(false);
-  const [sessionLoaded, setSessionLoaded] = useState(false); // Define sessionLoaded state
-  const [userData, setUserData] = useState(null); // Store user data
-
+  const [sessionLoaded, setSessionLoaded] = useState(false); 
+  const [userData, setUserData] = useState(null); 
   useEffect(() => {
     const checkSession = async () => {
       try {
@@ -24,9 +23,9 @@ function Support() {
         });
         if (response.ok) {
           const data = await response.json();
-          console.log('User data from session:', data); // Log user data to check if username is present
+          console.log('User data from session:', data); 
           if (data.loggedIn) {
-            // Optionally, you can set user data state here
+          
             setUserData(data.user);
             setTicketData((prevTicketData) => ({
               ...prevTicketData,
@@ -40,14 +39,13 @@ function Support() {
           }
         } else if (response.status === 401) {
           console.error('User not authenticated');
-          // Handle unauthorized access, e.g., redirect to the login page or display an error message
         } else {
           console.error('Session data not available. Response status:', response.status);
         }
       } catch (error) {
         console.error('Error fetching session data:', error);
       } finally {
-        // Mark session data as loaded regardless of success or failure
+      
         setSessionLoaded(true);
       }
     };
@@ -83,8 +81,6 @@ function Support() {
       if (response.ok) {
         setTicketCreated(true);
         console.log('Ticket created:', data);
-        // Redirect to the desired page after successful ticket creation
-        // navigate('/listofnames');
       } else {
         console.error('Ticket creation failed:', data.message);
       }
@@ -95,17 +91,17 @@ function Support() {
 
   return (
     <div>
-     
+    
       <div className="support-container">
       <h2>Support</h2>
         <div className="support-form">
           {sessionLoaded && userData && (
             <div>
               <p>Logged in as: {userData.username}</p>
-              {/* Display additional user information here */}
+      
             </div>
           )}
-          {ticketCreated && <p className="success-message">Ticket oprettet</p>} {/* Display the success message */}
+          {ticketCreated && <p className="success-message">Ticket oprettet</p>} 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Email:</label>
