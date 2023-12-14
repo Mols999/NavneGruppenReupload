@@ -4,40 +4,26 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 function Register() {
+  // State variables for user registration data
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+
+  // State variable to store registration message or error
   const [registrationMessage, setRegistrationMessage] = useState('');
-  const [sessionLoaded, setSessionLoaded] = useState(false);
+
+  // Access to navigation in React Router
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/session', {
-          credentials: 'include',
-        });
-        const data = await response.json();
-        console.log('User data from session:', data);
   
-        if (data.loggedIn) {
-          
-        }
-      } finally {
-    
-        setSessionLoaded(true);
-      }
-    };
-  
-    checkSession();
-  }, []);
-  
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
+      // Send a POST request to register the user
       const response = await axios.post('http://localhost:5000/register', {
         username,
         password,
@@ -47,17 +33,20 @@ function Register() {
       });
 
       if (response.status === 201) {
-        navigate('/listofnames');
+        // Redirect to the login page after successful registration
+        navigate('/login');
       } else {
+        // Set a registration error message
         setRegistrationMessage('Registration failed');
       }
     } catch (error) {
+      // Set an error message based on the response or a default message
       setRegistrationMessage(error.response.data.message || 'Registration failed');
     }
   };
 
   return (
-    <div className="register-box"> 
+    <div className="register-box">
       <div className="register-container">
         <h2>Opret konto</h2>
         {registrationMessage && <p>{registrationMessage}</p>}

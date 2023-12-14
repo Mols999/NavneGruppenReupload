@@ -10,7 +10,7 @@ services:
     depends_on:
       - navnegruppen-mongodb
     environment:
-      MONGO_URI: 'mongodb://navnegruppen-mongodb:27017/NewbornNamesDB'
+      MONGO_URI: 'mongodb+srv://Mols:ID4EY0Cqr80zSnH2@cluster0.euyeftl.mongodb.net/NewbornNamesCloudDB?retryWrites=true&w=majority'
       TYPE: 'commonjs' 
 
   navnegruppen-mongodb:

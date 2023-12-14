@@ -4,35 +4,47 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 function Login() {
+  // State variables to store email, password, and login message
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginMessage, setLoginMessage] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Function to handle the form submission when the user tries to log in
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const response = await fetch('http://localhost:5000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    const response = await fetch('http://localhost:5000/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-      const data = await response.json();
-      console.log('Server Response:', data);
-      if (response.status === 200) {
-        localStorage.setItem('userData', JSON.stringify(data.user)); 
-        navigate('/listofnames');
-      } else {
-        setLoginMessage(data.message || 'Login failed');
-      }
-    } catch (error) {
+    if (!response.ok) {
+      // Handle server errors
+      const errorData = await response.json();
+      setLoginMessage(errorData.message || 'Login failed');
+      return;
+    }
+
+    // Parse the response JSON data
+    const data = await response.json();
+
+    // Check if the 'user' property exists in the response
+    if (data && data.user) {
+      localStorage.setItem('userData', JSON.stringify(data.user));
+      navigate('/listofnames');
+    } else {
       setLoginMessage('Login failed');
     }
-  };
+  } catch (error) {
+    // Set a login error message for unexpected errors
+    setLoginMessage('Login failed');
+  }
+};
 
   return (
     <div className="login-container">

@@ -1,84 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './Support.css';
 
 function Support() {
+  // Get user data from local storage
+  const userData = JSON.parse(localStorage.getItem('userData'));
+
+  // Initialize state for ticket data
   const [ticketData, setTicketData] = useState({
-    sender: '', // Update this with the user's username
+    sender: userData.username, 
     message: '',
     personalInfo: {
-      email: '',
-      firstName: '',
-      lastName: '',
+      email: userData.email, 
+      firstName: userData.firstName, 
+      lastName: userData.lastName, 
     },
   });
 
+  // State to track if the ticket is successfully created
   const [ticketCreated, setTicketCreated] = useState(false);
-  const [sessionLoaded, setSessionLoaded] = useState(false); 
-  const [userData, setUserData] = useState(null); 
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/session', {
-          credentials: 'include',
-        });
-        if (response.ok) {
-          const data = await response.json();
-          console.log('User data from session:', data); 
-          if (data.loggedIn) {
-          
-            setUserData(data.user);
-            setTicketData((prevTicketData) => ({
-              ...prevTicketData,
-              sender: data.user.username || '',
-              personalInfo: {
-                email: data.user.email || '',
-                firstName: data.user.firstName || '',
-                lastName: data.user.lastName || '',
-              },
-            }));
-          }
-        } else if (response.status === 401) {
-          console.error('User not authenticated');
-        } else {
-          console.error('Session data not available. Response status:', response.status);
-        }
-      } catch (error) {
-        console.error('Error fetching session data:', error);
-      } finally {
-      
-        setSessionLoaded(true);
-      }
-    };
 
-    checkSession();
-  }, []);
-
+  // Handle change in the message input field
   const handleChange = (e) => {
     if (e.target.name === 'message') {
       setTicketData({ ...ticketData, [e.target.name]: e.target.value });
-    } else {
-      setTicketData({
-        ...ticketData,
-        personalInfo: { ...ticketData.personalInfo, [e.target.name]: e.target.value },
-      });
     }
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Submitting ticket data:', ticketData);
 
     try {
+      // Send a POST request to create a new ticket
       const response = await fetch('http://localhost:5000/tickets', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(ticketData),
+        body: JSON.stringify(ticketData), // Send ticket data in the request body
       });
 
       const data = await response.json();
       if (response.ok) {
+        // If the response is successful, set ticketCreated to true
         setTicketCreated(true);
         console.log('Ticket created:', data);
       } else {
@@ -91,17 +56,10 @@ function Support() {
 
   return (
     <div>
-    
       <div className="support-container">
-      <h2>Support</h2>
+        <h2>Support</h2>
         <div className="support-form">
-          {sessionLoaded && userData && (
-            <div>
-              <p>Logged in as: {userData.username}</p>
-      
-            </div>
-          )}
-          {ticketCreated && <p className="success-message">Ticket oprettet</p>} 
+          {ticketCreated && <p className="success-message">Ticket oprettet</p>}
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Email:</label>
@@ -109,7 +67,7 @@ function Support() {
                 type="email"
                 name="email"
                 value={ticketData.personalInfo.email}
-                onChange={handleChange}
+                readOnly
                 required
               />
             </div>
@@ -119,7 +77,7 @@ function Support() {
                 type="text"
                 name="firstName"
                 value={ticketData.personalInfo.firstName}
-                onChange={handleChange}
+                readOnly
                 required
               />
             </div>
@@ -129,7 +87,7 @@ function Support() {
                 type="text"
                 name="lastName"
                 value={ticketData.personalInfo.lastName}
-                onChange={handleChange}
+                readOnly
                 required
               />
             </div>

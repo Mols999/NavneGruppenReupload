@@ -6,32 +6,36 @@ const User = require('./User.cjs');
 const Ticket = require('./Ticket.cjs');
 const { BoyName, GirlName, InternationalBoyName, InternationalGirlName, UnisexName } = require('./Names.cjs');
 
+// Create an instance of the Express application
 const app = express();
 
+// Create a Set to store liked names
+const likedNames = new Set();
 
-// CORS configuration
+// Configure CORS middleware to allow requests from specified origins
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174'], // Add 'http://localhost:5174' to the allowed origins
+  origin: ['http://localhost:5173', 'http://localhost:5174'],
   credentials: true,
 }));
 
-
+// Configure session middleware
 app.use(
   session({
     secret: 'your-sec23423ret-key',
     resave: false,
     saveUninitialized: false,
-    // Add any other session configuration options here
   })
 );
 
+// Parse JSON request bodies
 app.use(express.json());
 
-// Connect to MongoDB
+// Connect to MongoDB database
 mongoose.connect('mongodb+srv://Mols:ID4EY0Cqr80zSnH2@cluster0.euyeftl.mongodb.net/NewbornNamesCloudDB?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
 
+// Define route for user login
   app.post('/login', async (req, res) => {
     try {
       const { email, password } = req.body;
@@ -42,17 +46,15 @@ mongoose.connect('mongodb+srv://Mols:ID4EY0Cqr80zSnH2@cluster0.euyeftl.mongodb.n
   
       if (user) {
         if (user.password === password) {
-          // Set user session data after successful login
           req.session.user = {
             id: user._id,
             email: user.email,
             firstName: user.personalInfo.firstName,
             lastName: user.personalInfo.lastName,
             username: user.username,
-            // Add other user data fields here as needed
+             partner: user.partner,
           };
   
-          // Log the session user
           console.log('User Data:', req.session.user);
   
           res.status(200).json({ message: 'Login successful', user: req.session.user });
@@ -70,47 +72,45 @@ mongoose.connect('mongodb+srv://Mols:ID4EY0Cqr80zSnH2@cluster0.euyeftl.mongodb.n
     }
   });
   
+// Define route for user registration
+  app.post('/register', async (req, res) => {
+    try {
+      const { username, password, firstName, lastName, email, partner } = req.body;
+      console.log('Registration attempt:', { username, password, firstName, lastName, email, partner });
+  
+      const existingUser = await User.findOne({ 
+        $or: [{ email }, { username }]
+      });
+      if (existingUser) {
+        console.log('User already exists with email or username:', email, username);
+        return res.status(400).json({ message: 'User already exists' });
+      }
+  
 
-app.post('/register', async (req, res) => {
-  try {
-    const { username, password, firstName, lastName, email } = req.body;
-    console.log('Registration attempt:', { username, password, firstName, lastName, email });
-
-    // Check for existing user with the same username or email
-    const existingUser = await User.findOne({ 
-      $or: [{ email }, { username }]
-    });
-    if (existingUser) {
-      console.log('User already exists with email or username:', email, username);
-      return res.status(400).json({ message: 'User already exists' });
+      const newUser = new User({
+        username,
+        password, 
+        personalInfo: {
+          firstName,
+          lastName,
+        },
+        email,
+        likedNames: [], 
+        matches: [],    
+        partner: partner || null, 
+      });
+  
+      await newUser.save();
+      console.log('User registered successfully:', newUser);
+  
+      res.status(201).json({ message: 'User registered successfully', newUser });
+    } catch (error) {
+      console.error('Registration error:', error);
+      res.status(500).json({ message: 'Server error' });
     }
+  });
 
-    // Create a new user
-    const newUser = new User({
-      username,
-      password, // Consider using hashing for the password
-      personalInfo: {
-        firstName,
-        lastName,
-      },
-      email,
-      likedNames: [], // Initialize with empty array
-      matches: []    // Initialize with empty array
-    });
-
-    await newUser.save();
-    console.log('User registered successfully:', newUser);
-
-    res.status(201).json({ message: 'User registered successfully', newUser });
-  } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-
-
-// Route to get Boy Names
+// Define routes for retrieving lists of BoyNames
 app.get('/BoyNames', async (req, res) => {
   try {
     const boyNames = await BoyName.find();
@@ -120,7 +120,7 @@ app.get('/BoyNames', async (req, res) => {
   }
 });
 
-// Route to get Girl Names
+// Define routes for retrieving lists of GirlNames
 app.get('/GirlNames', async (req, res) => {
   try {
     const girlNames = await GirlName.find();
@@ -130,7 +130,7 @@ app.get('/GirlNames', async (req, res) => {
   }
 });
 
-// Route for International Boy Names
+// Define routes for retrieving lists of InternationalBoyNames
 app.get('/InternationalBoyNames', async (req, res) => {
   try {
     const internationalBoyNames = await InternationalBoyName.find();
@@ -140,7 +140,7 @@ app.get('/InternationalBoyNames', async (req, res) => {
   }
 });
 
-// Route for International Girl Names
+// Define routes for retrieving lists of InternationalGirlNames
 app.get('/InternationalGirlNames', async (req, res) => {
   try {
     const internationalGirlNames = await InternationalGirlName.find();
@@ -150,7 +150,7 @@ app.get('/InternationalGirlNames', async (req, res) => {
   }
 });
 
-// Route for Unisex Names
+// Define routes for retrieving lists of UnisexNames
 app.get('/UnisexNames', async (req, res) => {
   try {
     const unisexNames = await UnisexName.find();
@@ -160,19 +160,18 @@ app.get('/UnisexNames', async (req, res) => {
   }
 });
 
-
-// Route to create a support ticket
+// Define route for creating tickets
 app.post('/tickets', async (req, res) => {
   console.log("Received ticket data:", req.body);
 
-  // Extract user data from the request body
-  const { userData, message } = req.body;
+
+  const { sender, message, personalInfo } = req.body;
 
   try {
-    // Create a new ticket and include user data
     const newTicket = new Ticket({
-      sender: userData.username, // Assuming 'username' is the user identifier
+      sender, 
       message,
+      personalInfo,
     });
 
     await newTicket.save();
@@ -182,7 +181,7 @@ app.post('/tickets', async (req, res) => {
   }
 });
 
-
+// Define route for checking session status
 app.get('/session', (req, res) => {
   if (req.session.user) {
     const userData = {
@@ -199,22 +198,165 @@ app.get('/session', (req, res) => {
   }
 });
 
+// Define route for liking a name
+app.post('/likeName', async (req, res) => {
+  try {
+    const { userId, name } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
 
 
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-app.post('/logout', (req, res) => {
-  if (req.session) {
-    req.session.destroy(err => {
-      if (err) {
-        res.status(500).json({ message: 'Error logging out' });
-      } else {
-        res.status(200).json({ message: 'Logout successful' });
+    if (!user.likedNames.includes(name)) {
+      user.likedNames.push(name);
+    }
+
+  
+    if (user.partner) {
+      const partner = await User.findById(user.partner);
+      if (partner && partner.likedNames.includes(name)) {
+      
+        if (!user.matches.includes(name)) {
+          user.matches.push(name);
+
+          if (!partner.matches.includes(name)) {
+            partner.matches.push(name);
+            await partner.save();
+          }
+        }
       }
-    });
+    }
+
+    await user.save();
+
+    res.status(200).json({ message: 'Name liked successfully' });
+  } catch (error) {
+    console.error('Error in liking name:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
 
 
+// Define route for retrieving liked names for a user
+app.get('/likedNames/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(user.likedNames);
+  } catch (error) {
+    console.error('Error fetching liked names:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Define route for retrieving matched names for a user
+app.get('/matchedNames/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+  
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(user.matches);
+  } catch (error) {
+    console.error('Error fetching matched names:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Define route for adding a partner to a user
+app.post('/addPartner', async (req, res) => {
+  try {
+    const { username, partnerUsername } = req.body;
+
+    console.log('Request data:', { username, partnerUsername });
+    const currentUser = await User.findOne({ username });
+    
+    if (!currentUser) {
+      return res.status(404).json({ message: 'Current user not found' });
+    }
+    const partnerUser = await User.findOne({ username: partnerUsername });
+
+    if (!partnerUser) {
+      console.log('Partner user not found:', partnerUsername);
+      return res.status(404).json({ message: 'Partner user not found' });
+    }
+
+    console.log('Updating partner for user:', currentUser.username);
+
+    currentUser.partner = partnerUser._id;
+    await currentUser.save();
+
+    console.log('Partner added successfully for user:', currentUser.username);
+    res.status(200).json({ message: 'Partner added successfully', currentUser });
+  } catch (error) {
+    console.error('Error adding partner:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Define route for removing a name from a user's list
+app.post('/removeName/:userId', async (req, res) => {
+  try {
+      const { userId } = req.params;
+      const { name, listType } = req.body;
+
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+
+      if (listType === 'likedNames') {
+          user.likedNames = user.likedNames.filter(n => n !== name);
+      } else if (listType === 'matchedNames') {
+          user.matches = user.matches.filter(n => n !== name);
+      }
+
+      await user.save();
+      res.status(200).json({ message: 'Name removed successfully' });
+  } catch (error) {
+      console.error('Error removing name:', error);
+      res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Define route for user logout
+app.post('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Error destroying session:', err);
+      res.status(500).send('Internal Server Error');
+    } else {
+      res.status(200).json({ message: 'Logout successful' });
+    }
+  });
+});
+
+// Define the port for the server to listen on
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
